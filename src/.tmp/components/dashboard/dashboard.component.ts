@@ -14,10 +14,10 @@ import {
   SimpleChanges,
   Type,
   ViewChild,
-  ViewContainerRef
-} from "@angular/core";
-import {DragEvent} from "./drag-event-type";
-import {WidgetComponent} from "../widget/widget.component";
+  ViewContainerRef,
+} from '@angular/core';
+import { DragEvent } from './drag-event-type';
+import { WidgetComponent } from '../widget/widget.component';
 
 @Component({
   selector: 'dashboard',
@@ -29,39 +29,41 @@ import {WidgetComponent} from "../widget/widget.component";
     '(document:touchmove)': '_onMouseMove($event)',
     '(document:touchend)': '_onMouseUp($event)',
     '(document:touchcancel)': '_onMouseUp($event)',
-    '(document:scroll)': '_onScroll($event)'
+    '(document:scroll)': '_onScroll($event)',
   },
-  styles: [`
-    :host {
-      position: relative;
-      display: block;
-    }
+  styles: [
+    `
+      :host {
+        position: relative;
+        display: block;
+      }
 
-    :host /deep/ .widget {
-      position: absolute;
-      top: 0;
-      left: 0;
-      -webkit-touch-callout: none; /* iOS Safari */
-      -webkit-user-select: none; /* Chrome/Safari/Opera */
-      -khtml-user-select: none; /* Konqueror */
-      -moz-user-select: none; /* Firefox */
-      -ms-user-select: none; /* Internet Explorer/Edge */
-      user-select: none;
-      /* Non-prefixed version, currently
+      :host /deep/ .widget {
+        position: absolute;
+        top: 0;
+        left: 0;
+        -webkit-touch-callout: none; /* iOS Safari */
+        -webkit-user-select: none; /* Chrome/Safari/Opera */
+        -khtml-user-select: none; /* Konqueror */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+        user-select: none;
+        /* Non-prefixed version, currently
                              not supported by any browser */
-    }
+      }
 
-    :host /deep/ .widget.animate {
-      -webkit-transition: all 300ms ease-out;
-      -moz-transition: all 300ms ease-out;
-      -o-transition: all 300ms ease-out;
-      transition: all 300ms ease-out;
-    }
+      :host /deep/ .widget.animate {
+        -webkit-transition: all 300ms ease-out;
+        -moz-transition: all 300ms ease-out;
+        -o-transition: all 300ms ease-out;
+        transition: all 300ms ease-out;
+      }
 
-    :host /deep/ .widget.active {
-      z-index: 100000;
-    }`
-  ]
+      :host /deep/ .widget.active {
+        z-index: 100000;
+      }
+    `,
+  ],
 })
 export class DashboardComponent implements AfterViewInit, OnChanges {
   //  Event Emitters
@@ -76,14 +78,15 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
 
   //    Public variables
   public dragEnable: boolean = true;
-  @ViewChild('target', {read: ViewContainerRef, static: false}) private _viewCntRef: ViewContainerRef;
+  @ViewChild('target', { read: ViewContainerRef, static: false })
+  private _viewCntRef: ViewContainerRef;
 
   //    Private variables
   static SCROLL_STEP: number = 15;
   static SCROLL_DELAY: number = 100;
   private _width: number = 0;
   private _nbColumn: number = 0;
-  private _previousPosition: any = {top: 0, left: 0};
+  private _previousPosition: any = { top: 0, left: 0 };
   private _isDragging: boolean = false;
   private _lastOrder: Array<string> = [];
   private _currentElement: WidgetComponent;
@@ -95,11 +98,11 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
 
   @ContentChildren(WidgetComponent) private _items: QueryList<WidgetComponent>;
 
-  constructor(private _componentFactoryResolver: ComponentFactoryResolver,
-              private _ngEl: ElementRef,
-              private _renderer: Renderer2) {
-
-  }
+  constructor(
+    private _componentFactoryResolver: ComponentFactoryResolver,
+    private _ngEl: ElementRef,
+    private _renderer: Renderer2,
+  ) {}
 
   get width() {
     return this._ngEl.nativeElement.offsetWidth;
@@ -129,13 +132,15 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
         hostView: null,
         destroy: null,
         onDestroy: null,
-        changeDetectorRef: null
+        changeDetectorRef: null,
       });
     });
     this._calculSizeAndColumn();
     this._offset = {
-      top: this._ngEl.nativeElement.offsetY || this._ngEl.nativeElement.offsetTop,
-      left: this._ngEl.nativeElement.offsetX || this._ngEl.nativeElement.offsetLeft
+      top:
+        this._ngEl.nativeElement.offsetY || this._ngEl.nativeElement.offsetTop,
+      left:
+        this._ngEl.nativeElement.offsetX || this._ngEl.nativeElement.offsetLeft,
     };
     this._calculPositions();
   }
@@ -155,7 +160,9 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
   }
 
   public addItem<T extends WidgetComponent>(ngItem: Type<T>): T {
-    let factory = this._componentFactoryResolver.resolveComponentFactory(ngItem);
+    let factory = this._componentFactoryResolver.resolveComponentFactory(
+      ngItem,
+    );
     const ref = this._viewCntRef.createComponent(factory);
     const newItem: T = ref.instance;
     newItem.setEventListener(this._onMouseDown.bind(this));
@@ -218,17 +225,16 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
     if (element) {
       this._removeElement(element);
     }
-
   }
 
   private _removeElement(widget: ComponentRef<WidgetComponent>): void {
     if (!widget) return;
     this._enableAnimation();
-    const index = widget.hostView == null ? -1 : this._viewCntRef.indexOf(widget.hostView);
+    const index =
+      widget.hostView == null ? -1 : this._viewCntRef.indexOf(widget.hostView);
     if (index == -1) {
       widget.instance.removeFromParent();
-    }
-    else {
+    } else {
       this._viewCntRef.remove(index);
     }
     this._elements = this._elements.filter((item, i) => item !== widget);
@@ -241,10 +247,16 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
     for (let i = 0; i < this._nbColumn; i++) {
       lines[i] = 0;
     }
-    this._positionWidget(lines, this._elements, 0, 0, 0)
+    this._positionWidget(lines, this._elements, 0, 0, 0);
   }
 
-  private _positionWidget(lines: number[], items: ComponentRef<WidgetComponent>[], index: number, column: number, row: number): void {
+  private _positionWidget(
+    lines: number[],
+    items: ComponentRef<WidgetComponent>[],
+    index: number,
+    column: number,
+    row: number,
+  ): void {
     if (!items[index]) {
       let remainingHeight = 0;
       for (let i = 0; i < lines.length; i++) {
@@ -255,23 +267,28 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
       }
       if (remainingHeight > 0) {
         this._positionWidget(lines, items, index, column, row + 1);
-      }
-      else {
+      } else {
         const height = row * this.widgetsSize[1] + row * this.margin;
-        this._renderer.setStyle(this._ngEl.nativeElement, 'height', height + 'px');
+        this._renderer.setStyle(
+          this._ngEl.nativeElement,
+          'height',
+          height + 'px',
+        );
       }
       return;
     }
 
     const item = items[index].instance;
 
-    let itemWidth = item.size[0]
+    let itemWidth = item.size[0];
     if (itemWidth > this._nbColumn) {
       itemWidth = this._nbColumn;
     }
 
-    item.width = this.widgetsSize[0] * itemWidth + ( itemWidth - 1 ) * this.margin;
-    item.height = this.widgetsSize[1] * item.size[1] + ( item.size[1] - 1 ) * this.margin;
+    item.width =
+      this.widgetsSize[0] * itemWidth + (itemWidth - 1) * this.margin;
+    item.height =
+      this.widgetsSize[1] * item.size[1] + (item.size[1] - 1) * this.margin;
 
     let haveEnoughSpace = column + itemWidth - 1 <= this._nbColumn;
     while (lines[column] > 0 || !haveEnoughSpace) {
@@ -294,7 +311,8 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
       }
     }
 
-    const left = column * this.widgetsSize[0] + column * this.margin + this.margin / 2;
+    const left =
+      column * this.widgetsSize[0] + column * this.margin + this.margin / 2;
     const top = row * this.widgetsSize[1] + row * this.margin + this.margin / 2;
 
     lines[column] = item.size[1];
@@ -308,7 +326,9 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
 
   private _calculSizeAndColumn(): void {
     this._width = this._ngEl.nativeElement.offsetWidth;
-    this._nbColumn = Math.floor(this._width / ( this.widgetsSize[0] + this.margin ));
+    this._nbColumn = Math.floor(
+      this._width / (this.widgetsSize[0] + this.margin),
+    );
   }
 
   private _onResize(e: any): void {
@@ -321,7 +341,7 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
     if (this._isDragging) {
       this.onDragStart.emit({
         widget,
-        event: e
+        event: e,
       });
       widget.addClass('active');
       this._currentElement = widget;
@@ -363,15 +383,17 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
       }
       this.onDrag.emit({
         widget: this._currentElement,
-        event: e
+        event: e,
       });
       const pos = this._getMousePosition(e);
 
       let left = pos.left - this._offset.left;
       let top = pos.top - this._offset.top;
 
-      if (Math.abs(pos.top - this._previousPosition.top) > this.THRESHOLD
-        || Math.abs(pos.left - this._previousPosition.left) > this.THRESHOLD) {
+      if (
+        Math.abs(pos.top - this._previousPosition.top) > this.THRESHOLD ||
+        Math.abs(pos.left - this._previousPosition.left) > this.THRESHOLD
+      ) {
         this._elements.sort(this._compare);
 
         this._calculPositions();
@@ -388,10 +410,20 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
   }
 
   private _scrollDown(container: any, pageY: number, e: any): boolean {
-    if (this._isDragging && container.scrollTop < ( this._ngEl.nativeElement.offsetHeight - window.innerHeight + this._currentElement.height ) && this._isScrolling) {
+    if (
+      this._isDragging &&
+      container.scrollTop <
+        this._ngEl.nativeElement.offsetHeight -
+          window.innerHeight +
+          this._currentElement.height &&
+      this._isScrolling
+    ) {
       container.scrollTop += DashboardComponent.SCROLL_STEP;
       this._scrollChange = DashboardComponent.SCROLL_STEP;
-      setTimeout(this._scrollDown.bind(this, container, pageY, e), DashboardComponent.SCROLL_DELAY);
+      setTimeout(
+        this._scrollDown.bind(this, container, pageY, e),
+        DashboardComponent.SCROLL_DELAY,
+      );
     }
     return true;
   }
@@ -400,7 +432,10 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
     if (this._isDragging && container.scrollTop != 0 && this._isScrolling) {
       container.scrollTop -= DashboardComponent.SCROLL_STEP;
       this._scrollChange = -DashboardComponent.SCROLL_STEP;
-      setTimeout(this._scrollUp.bind(this, container, pageY, e), DashboardComponent.SCROLL_DELAY);
+      setTimeout(
+        this._scrollUp.bind(this, container, pageY, e),
+        DashboardComponent.SCROLL_DELAY,
+      );
     }
     return true;
   }
@@ -412,18 +447,18 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
       let top;
       left = this._currentMouseEvent.clientX - refPos.left;
       top = this._currentMouseEvent.clientY - refPos.top;
-      this.onDrag.emit({widget: this._currentElement, event: e});
+      this.onDrag.emit({ widget: this._currentElement, event: e });
       left = left - this._offset.left;
       let top_1 = top - this._offset.top + this._scrollChange;
-      if (Math.abs(top - this._previousPosition.top) > this.THRESHOLD
-        || Math.abs(left - this._previousPosition.left) > this.THRESHOLD) {
+      if (
+        Math.abs(top - this._previousPosition.top) > this.THRESHOLD ||
+        Math.abs(left - this._previousPosition.left) > this.THRESHOLD
+      ) {
         this._elements.sort(this._compare);
         this._calculPositions();
         //  this._previousPosition = pos;
-
       }
       this._currentElement.setPosition(top_1, left);
-
     }
     return true;
   }
@@ -435,7 +470,7 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
       if (this._currentElement) {
         this.onDragEnd.emit({
           widget: this._currentElement,
-          event: e
+          event: e,
         });
         this._currentElement.removeClass('active');
         this._currentElement.addClass('animate');
@@ -450,7 +485,8 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
       }
       const currentOrder = this.order;
 
-      const isOrderChanged = JSON.stringify(this._lastOrder) != JSON.stringify(currentOrder);
+      const isOrderChanged =
+        JSON.stringify(this._lastOrder) != JSON.stringify(currentOrder);
 
       if (isOrderChanged) {
         this.onOrderChange.emit(this.order);
@@ -467,7 +503,10 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
   }
 
   private _isTouchEvent(e: any): any {
-    return ( ( <any>window ).TouchEvent && e instanceof TouchEvent ) || ( e.touches || e.changedTouches );
+    return (
+      ((<any>window).TouchEvent && e instanceof TouchEvent) ||
+      (e.touches || e.changedTouches)
+    );
   }
 
   private _getOffsetFromTarget(e: any) {
@@ -479,14 +518,13 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
       const rect = e.target.getBoundingClientRect();
       x = e.pageX - rect.left;
       y = e.pageY - rect.top;
-      scrollOffset = ( <any>document ).body.scrollTop;
-    }
-    else {
+      scrollOffset = (<any>document).body.scrollTop;
+    } else {
       x = e.offsetX || e.offsetLeft;
       y = e.offsetY || e.offsetTop;
     }
 
-    return {top: y - scrollOffset, left: x};
+    return { top: y - scrollOffset, left: x };
   }
 
   private _getMousePosition(e: any): any {
@@ -497,25 +535,40 @@ export class DashboardComponent implements AfterViewInit, OnChanges {
     let top: number = e.clientY - refPos.top;
     return {
       left: left,
-      top: top
+      top: top,
     };
   }
 
-  private _compare(widget1: ComponentRef<WidgetComponent>, widget2: ComponentRef<WidgetComponent>): number {
-    if (widget1.instance.offset.top > widget2.instance.offset.top + widget2.instance.height / 2) {
+  private _compare(
+    widget1: ComponentRef<WidgetComponent>,
+    widget2: ComponentRef<WidgetComponent>,
+  ): number {
+    if (
+      widget1.instance.offset.top >
+      widget2.instance.offset.top + widget2.instance.height / 2
+    ) {
       return +1;
     }
-    if (widget2.instance.offset.top > widget1.instance.offset.top + widget1.instance.height / 2) {
+    if (
+      widget2.instance.offset.top >
+      widget1.instance.offset.top + widget1.instance.height / 2
+    ) {
       return -1;
     }
-    if (( widget1.instance.offset.left + ( widget1.instance.width / 2 ) ) > ( widget2.instance.offset.left + ( widget2.instance.width / 2 ) )) {
+    if (
+      widget1.instance.offset.left + widget1.instance.width / 2 >
+      widget2.instance.offset.left + widget2.instance.width / 2
+    ) {
       return +1;
     }
-    if (( widget2.instance.offset.left + ( widget2.instance.width / 2 ) ) > ( widget1.instance.offset.left + ( widget1.instance.width / 2 ) )) {
+    if (
+      widget2.instance.offset.left + widget2.instance.width / 2 >
+      widget1.instance.offset.left + widget1.instance.width / 2
+    ) {
       return -1;
     }
     return 0;
-  };
+  }
 
   private _enableAnimation(): void {
     this._elements.forEach(item => {
